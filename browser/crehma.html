@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<title></title>
+	<link rel="stylesheet" href="">
+
+</head>
+<body>
+	<button onclick="sendRequest()">Send CREHMA Request</button>
+</body>
+<script src="/browser/CREHMA.js"></script>
+<script src="/browser/HMACSHA256.js"></script>
+<script src="/browser/SHA256.js"></script>
+<script>
+var private_key_object = null; 
+var base64Key = "fJW7ebII2E4RU3fD4BjixIDnV++0mq8LUY5TMx2C/g5nRDDies4AFLZ939sU1uoMH+uey1xUMKVSFCd+VNXg+4yOS1M/DtM+9ObW108iNmlXZQsKgXLkRLrBkZ78y2r8Mml3WXe14ktXjCjhRXTx5lBsTKMEcBTxepe1aQ+0hLNOUDhsUKr31t9fS5/9nAQC7s9sPln54Oic1pnDOIfnBEku/vPl3zQCMtU2eRk9v+AfschSUGOvLV6Ctg0cGuSi/h8oKZuUYXrjoehUo1gBvZLVBpcCxZt1/ySGTInLic3QbfZwlT5sJKrYvfHXjANOEIM7JZMaSnfMdK2R9OJJpw==";
+
+var kid = "jCREHMAKey"
+async function importKey(base64key){
+    var promise_key = await crypto.subtle.importKey("raw",base64StringToArrayBuffer(base64Key),{name: "HMAC", hash: {name: "SHA-256"}}, false, ["sign", "verify"]);
+
+    return promise_key;
+}
+var crehma = ""
+var signatureAlgorithm = "";
+var hashAlgorithm = "";
+var addHeaders = "X-Header;Y-Header";
+importKey(base64Key).then(function(key){
+    private_key_object = key
+    signatureAlgorithm = new HMACSHA256();
+    signatureAlgorithm.setKey(kid,private_key_object);
+
+    crehma = new CREHMA()
+    const tbsResponseHeaders = crehma.getTbsResponseHeaders();
+    const tbsRequestHeaders = crehma.getTbsRequestHeaders();
+
+
+
+    hashAlgorithm = new SHA256();
+    
+    crehma.addSignatureAlgorithm(signatureAlgorithm.getName(),signatureAlgorithm);
+    crehma.addHashAlgorithm(hashAlgorithm.getName(),hashAlgorithm)
+})
+
+
+async function sendRequest(){
+    const method = "GET"
+		const path = "/";
+		var request = new XMLHttpRequest();
+    request.open(method,path,false);
+    request.setRequestHeader("Accept","text/html");
+    request.setRequestHeader("X-Header","test");
+    request.setRequestHeader("Y-Header","test2");
+		
+    
+    var crehmaReq = new CREHMARequest(method,path);
+    crehmaReq.setHeader("Host",location.host);
+    crehmaReq.setHeader("Accept","text/html");
+    crehmaReq.setHeader("X-Header","test");
+    crehmaReq.setHeader("Y-Header","test2");
+    var signatureHeaderValue = await crehma.generateSignatureHeaderRequest(crehmaReq,kid,addHeaders,signatureAlgorithm.getName(),hashAlgorithm.getName());
+
+    request.setRequestHeader("Signature",signatureHeaderValue);
+
+    request.send();
+
+    console.log(request);
+
+    var crehmaRes = new CREHMAResponse(request.status);
+    crehmaRes.setBody(request.response);
+
+    responseHeaders = mapHeaders(request.getAllResponseHeaders());
+
+    for(var header in responseHeaders){
+      crehmaRes.setHeader(header,responseHeaders[header])
+    }
+
+    console.log(await crehma.verifyResponse(crehmaRes,crehmaReq));
+
+}
+
+function base64StringToArrayBuffer(b64str) {
+  var byteStr = atob(b64str)
+  var bytes = new Uint8Array(byteStr.length)
+  for (var i = 0; i < byteStr.length; i++) {
+    bytes[i] = byteStr.charCodeAt(i)
+  }
+  return bytes.buffer
+}
+
+function mapHeaders(headers){
+  var arr = headers.trim().split(/[\r\n]+/);
+
+    // Create a map of header names to values
+    var headerMap = {};
+    arr.forEach(function (line) {
+      var parts = line.split(': ');
+      var header = parts.shift();
+      var value = parts.join(': ');
+      headerMap[header] = value;
+    });
+
+    return headerMap
+}
+
+</script>
+</html>
