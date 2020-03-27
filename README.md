@@ -1,0 +1,3 @@
+# CREHMA.js
+CREHMA is end-to-end authenticity and integrity scheme for HTTP messages. CREHMA.js is the reference implementation of CREHMA. To ensure end-to-end authenticity and integrity, CREHMA builds a signature over the whole HTTP message. This signature is then verified by the other endpoint, i.e. client or server.
+CREHMA.js is designed to be used in any Javascript-based environemt such as Node, vert.x or in the Webbrowser. 
