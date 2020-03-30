@@ -5,6 +5,8 @@ CREHMA.js is designed to be used in any Javascript-based environemt such as Node
 # How does it works?
 CREHMA creates a digital signature over the whole HTTP message by concatenating the security-critical headers and the body to a string. This concatenated string is then signed by a given key. 
 
+![CREHMA protected message flow](https://github.com/hvnguyen86/crehma.js/blob/master/images/CREHMA_message_flow_fl.png =500px)
+
 Let's assume that the following HTTP request message 
 
 ```
