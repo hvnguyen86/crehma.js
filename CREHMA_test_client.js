@@ -29,13 +29,11 @@ var options = {
   method: 'GET',
   headers: {
     'Accept': 'application/json',
-    'Host': "localhost:3000",
-    "X-Header":"test",
-    "Y-Header": "test2"
+    'Host': "localhost:3000"
   }
 }
 
-var addHeaders = "X-Header;Y-Header";
+var addHeaders = "null";
 
 
 var crehmaReq = new CREHMARequest(options.method, options.path)
@@ -46,7 +44,7 @@ for (var header in options.headers) {
 }
 
 options.headers["Signature"] = c.generateSignatureHeaderRequest(crehmaReq,kid,addHeaders,signatureAlgorithm.getName(),hashAlgorithm.getName())
-
+console.log(options.headers["Signature"]);
 var crehma_res;
 const req = http.request(options, (res) => {
 
@@ -61,11 +59,14 @@ res.on('data', (d) => {
     process.stdout.write(d)
     crehma_res.setBody(d);
     console.log(c.verifyResponse(crehma_res,crehmaReq));
+    console.log(crehma_res.getHeader("Signature"));
   })
 })
 
 req.on('error', (error) => {
   //console.error(error)
 })
+
+
 
 req.end()

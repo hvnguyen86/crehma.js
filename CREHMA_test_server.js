@@ -110,6 +110,7 @@ const requestListener = function (req, res) {
 			res.statusCode = 200;
 			body = "Valid Request Signature " + new Date().getTime() + "\n";
 	 		res.setHeader("Content-Type","text/plain");
+	 		res.setHeader("Cache-Control","max-age=3600")
 		}
 
 		res.setHeader("Content-Length",body.length)

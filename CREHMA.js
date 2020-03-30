@@ -39,7 +39,8 @@ CREHMA.prototype.generateSignatureHeaderRequest = function(req,kid,addHeaders,si
 	var tvp = new Date().toISOString();
 	var tbs = this.buildTbsRequest(req,tvp,addHeaders,hash);
 	var sv = this.getSignatureAlgorithm(sig).sign(tbs,kid,sig);
-
+	console.log(tbs)
+	console.log(sv)
 	return sprintf(signature_header_template, sig, hash, kid, tvp, addHeaders, sv);
 }
 
@@ -65,7 +66,10 @@ CREHMA.prototype.generateSignatureHeaderResponse = function(res,req,kid,addHeade
 	var primaryCacheKey = req.getMethod() + " " + req.getHeader("Host") + req.getTarget()
 	var tbsWithoutTvp = this.buildTbsResponseWithoutTvp(res,primaryCacheKey,addHeaders,hash);
 	var tbs = tvp + "\n" + tbsWithoutTvp;
+	
 	var sv = this.getSignatureAlgorithm(sig).sign(tbs,kid);
+	console.log(tbs);
+	console.log(sv);
 	return {signatureHeaderValue: sprintf(signature_header_template, sig, hash, kid, tvp, addHeaders, sv), etag: etag, tbsWithoutTvp: tbsWithoutTvp}
 }
 
@@ -213,7 +217,7 @@ CREHMA.prototype.verifySignatureFreshness = function (res,tvpDate){
 
 CREHMA.prototype.verifySignatureFreshnessMaxAge = function(maxAge,tvpDate){
 
-	const now = Date.getTime();
+	const now = new Date().getTime();
 	const signatureExpirationDate = tvpDate + 5000 + parseInt(maxAge) * 1000;
 	return now < signatureExpirationDate ? true : false
 }
@@ -247,7 +251,7 @@ CREHMA.prototype.buildTbsResponseWithoutTvp = function(res,primaryCacheKey,addHe
 CREHMA.prototype.buildTbsRequest = function(req,tvp,addHeaders,hash){
 	tbs = tvp + "\n"
 	tbs +=  req.getMethod() + "\n"
-	tbs +=  req.getTarget() ? "/" : req.getTarget() + "\n"
+	tbs +=  req.getTarget() ? "/" + "\n" : req.getTarget() + "\n"
 	tbs +=  "HTTP/" + req.getVersion()  + "\n"
 
 	var tbsRequestHeaders = this.tbsRequestHeaders.concat(addHeaders.split(";"))
