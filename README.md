@@ -3,9 +3,10 @@ CREHMA stands for Cache-ware REST-ful HTTP Message Authentication. It is an end-
 CREHMA.js is designed to be used in any Javascript-based environemt such as Node, vert.x or in the Webbrowser. 
 
 # How does it works?
-CREHMA creates a digital signature over the whole HTTP message by concatenating the security-critical headers and the body to a string. This concatenated string is then signed by a given key. 
+CREHMA creates a digital signature over the whole HTTP message by concatenating the security-critical headers and the body to a string. This concatenated string is then signed by a given key. The signature value in conjunction with signature meta data is then included the Signature header. The other endpoint, i.e client or server, verifies the message's authenticity and integrity by validating the signature value in the Signature header. 
 
-![CREHMA protected message flow](https://github.com/hvnguyen86/crehma.js/blob/master/images/message_flow_fl.png "CREHMA protected message flow")
+The figure below shows an example message flow which protected by CREHMA. 
+<!-- ![CREHMA protected message flow](https://github.com/hvnguyen86/crehma.js/blob/master/images/message_flow_fl.png "CREHMA protected message flow") -->
 ![CREHMA protected message flow](https://github.com/hvnguyen86/crehma.js/blob/master/images/CREHMA_message_flow_fl.png "CREHMA protected message flow")
 <!-- <img src="https://github.com/hvnguyen86/crehma.js/blob/master/images/CREHMA_message_flow_fl.png" alt="Kitten"
 	width="50%" />
