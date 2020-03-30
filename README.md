@@ -3,7 +3,7 @@ CREHMA stands for Cache-ware REST-ful HTTP Message Authentication. It is an end-
 CREHMA.js is designed to be used in any Javascript-based environemt such as Node, vert.x or in the Webbrowser. 
 
 # How does it works?
-CREHMA creates a digital signature over the whole HTTP message by concatenating the security-critical headers and the body to a string. This concatenated string is then signed by a given key. The signature value in conjunction with signature meta data is then included the Signature header. The other endpoint, i.e client or server, verifies the message's authenticity and integrity by validating the signature value in the Signature header. 
+CREHMA creates a digital signature over the whole HTTP message by concatenating the security-critical headers and the body to a string. This concatenated string is then signed by a given key. The signature value in conjunction with signature meta data is then included the Signature header. The other endpoint, i.e client or server, verifies the message's authenticity and integrity by validating the signature value in the Signature header with a given key. 
 
 The figure below shows an example message flow which protected by CREHMA. 
 <!-- ![CREHMA protected message flow](https://github.com/hvnguyen86/crehma.js/blob/master/images/message_flow_fl.png "CREHMA protected message flow") -->
@@ -12,6 +12,14 @@ The figure below shows an example message flow which protected by CREHMA.
 	width="50%" />
 <img src="https://github.com/hvnguyen86/crehma.js/blob/master/images/CREHMA_message_flow_fl.png" alt="Kitten"
 	width="50%" /> -->
+The appended Signature header is marked in bold. CREHMA are compatible  with caches. Signed response messages can be stored and reused by caches as shown be the figure. If client received a reused response message from the cache then it needs to verify signature freshness in addition to the signature value. In this example, the signature freshness is calculated from the time stamp of tvp parameter and the max-age value of the Cache-Control header. The seconds in max-age (360) are then added to the tvp value (). 
+
+```
+2019-06-13T15:45:10.494Z + 360 <= <current_time>
+```
+
+The signature freshness is valid, If the sum is lower then the current time.
+
 
 Let's assume that the following HTTP request message 
 
